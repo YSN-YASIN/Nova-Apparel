@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Apparel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .hero-pattern {
+            background-color: #f3f4f6;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .product-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .btn-order {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-order:active {
+            transform: scale(0.95);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 0.75rem;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .image-placeholder {
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            border-radius: 5px;
+            background-size: 200% 100%;
+            animation: 1.5s shine linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position-x: -200%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased flex flex-col min-h-screen">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0 flex items-center gap-2">
+                    
+                        <span class="font-bold text-xl tracking-tight text-gray-900">Nova Apparel</span>
+                    </a>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8 sm:items-center">
+                    <a href="#" class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-indigo-500 text-sm font-medium">
+                        Home
+                    </a>
+                    <a href="#shop" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium transition-colors">
+                        Shop Collection
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium transition-colors">
+                        About Us
+                    </a>
+
+                    <div class="login flex items-right justify-content-right"> <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium transition-colors">
+                        Login
+                    </a></div>
+                </div>
+
+
+                <div class="flex items-center sm:hidden">
+                    <!-- Mobile menu button -->
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="relative bg-white overflow-hidden hero-pattern">
+        <div class="max-w-7xl mx-auto">
+            <div class="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 bg-transparent lg:bg-white/80 lg:backdrop-blur-sm pt-10 px-4 sm:px-6 lg:px-8">
+                <main class="mt-10 mx-auto max-w-7xl sm:mt-12 md:mt-16 lg:mt-20 xl:mt-28">
+                    <div class="sm:text-center lg:text-left">
+                        <span class="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold mb-4 tracking-wide border border-indigo-100">New Arrivals Spring '2026</span>
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                            <span class="block xl:inline">Define your</span>
+                            <span class="block text-indigo-600 xl:inline">signature style.</span>
+                        </h1>
+                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Discover the latest trends and timeless classics at Nova Apparel. Premium quality clothing designed to make you feel confident and comfortable every day.
+                        </p>
+                        <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <a href="#shop" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition-colors">
+                                    Shop Now
+                                </a>
+                            </div>
+                            <div class="mt-3 sm:mt-0 sm:ml-3">
+                                <a href="#" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 md:py-4 md:text-lg md:px-10 transition-colors">
+                                    View All collections
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <div class="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 hidden lg:block">
+            <!-- Using a solid color with an icon as a placeholder since we can't reliably load external images -->
+            <div class="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full bg-indigo-900 flex items-center justify-center relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                <i class="fa-solid fa-shirt text-9xl text-white opacity-10 transform -rotate-12 scale-150 absolute -right-10 -bottom-10"></i>
+                <div class="text-center z-10 p-8 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl">
+                    <h2 class="text-3xl font-bold text-white mb-2">Imaginative Designs</h2>
+                    <p class="text-indigo-200">Embrace the warmth with style.</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Products Section -->
+    <div id="shop" class="flex-grow bg-gray-50 pt-16 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-base text-indigo-600 font-semibold tracking-wide uppercase">Featured Items</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    Trending This Week
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
+                    Carefully curated pieces that combine comfort, durability, and modern aesthetics.
+                </p>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6 xl:gap-x-8" id="product-container">
+                <!-- Products will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center gap-2 mb-4 md:mb-0">
+                    
+                    <span class="font-bold text-lg text-gray-900">Nova Apparel</span>
+                </div>
+                <div class="flex space-x-6 md:order-2">
+                    <a href="https://www.facebook.com/novaapparel76" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">Facebook</span>
+                        <i class="fa-brands fa-facebook text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/novaapparel76" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">Instagram</span>
+                        <i class="fa-brands fa-instagram text-xl"></i>
+                    </a>
+                    <a href="https://wa.me/8801611764091" class="text-gray-400 hover:text-gray-500">
+                        <span class="sr-only">WhatsApp</span>
+                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                    </a>
+                </div>
+                <div class="mt-8 md:mt-0 md:order-1">
+                    <p class="text-center text-base text-gray-400">
+                        &copy; 2026 Nova Apparel. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content text-left relative">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+             <h3 class="text-lg text-center leading-6 font-medium text-gray-900 mb-2" id="modalTitle">Order Form</h3>
+            <div class="mt-2 px-4 pb-4">
+                <p class="text-sm text-gray-500">
+                    Product: <strong id="modalProductName" class="text-gray-800"></strong>
+                </p>
+                <div class="sizes">
+                    <p class="text-sm text-gray-500">Available Sizes:</p>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        
+                        <button class="bg-gray-200 text-gray-800 hover:bg-gray-300 py-2 px-4 rounded-md text-sm font-medium transition-colors">
+                            M
+                        </button>
+                        <button class="bg-gray-200 text-gray-800 hover:bg-gray-300 py-2 px-4 rounded-md text-sm font-medium transition-colors">
+                            L
+                        </button>
+                        <button class="bg-gray-200 text-gray-800 hover:bg-gray-300 py-2 px-4 rounded-md text-sm font-medium transition-colors">
+                            XL
+                        </button>
+                       
+                    </div>
+                </div>
+                
+                <div class="color">
+                    <p class="text-sm text-gray-500 mt-4">Available Colors:</p>
+                    <table>
+                        <tr>
+                            <td><input type="radio" id="black" name="color" value="black" class="text-sm text-black-500 cursor-pointer">
+                            <label for="black" class="text-sm text-black-500 cursor-pointer">Black</label></td>
+                        </tr>
+
+                        <tr>
+                            <td><input type="radio" id="green" name="color" value="green" class="text-sm text-green-500 cursor-pointer">
+                            <label for="green" class="text-sm text-green-500 cursor-pointer">Green</label></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="courier fee  border-1px border-gray-300 p-3 rounded-md">
+                    <p class="text-sm text-gray-500">Courier Service Fee:</p>
+                    <select name="" id="">
+                        
+                        <option value="60">Dhaka - 60 TK</option>
+                        <option value="120">Out Side Dhaka - 120 TK</option>
+                    </select>
+                </div>
+
+
+                <div class="mt-4 bg-gray-50 p-3 rounded-md text-left">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-gray-500">Price:</span>
+                        <span id="modalProductPrice" class="font-semibold text-gray-800"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5 sm:mt-6">
+                <a href="https://wa.me/8801611764091">
+                <button type="button"  id="continueShoppingBtn" class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm transition-colors">
+                 Confirm Order
+                </button>
+                 </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+</body>
+</html>
