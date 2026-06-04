@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Apparel</title>
+    <link rel="icon" type="image/png" href="../NovaApparel_Logo.png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- React and Babel CDNs -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Touch slider smooth transition */
+        .slider-transition {
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
+
+    <!-- React App Container -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // =========================================================================
+        // ⚙️ QUICK CONFIGURATION BLOCK
+        // Edit any values inside this object to instantly update your store frontend!
+        // =========================================================================
+        const STORE_CONFIG = {
+
+             // General Info
+            whatsappNumber: "+8801611764091", // Format: +[CountryCode][Number] (no spaces or dashes)
+            facebookPageUrl: "https://www.facebook.com/novaapparel76", // Facebook checkout target url
+            isInStock: true,                  // Set 'true' if in stock, 'false' to show Sold Out badge
+            discountPercent: 15,              // Discount percentage (e.g., 15 for 15% off)
+
+            // Shipping Zone Options (In BDT ৳)
+            shipping: {
+                dhaka: {
+                    fee: 60,
+                    label: "Inside Dhaka City",
+                    subtext: "Fast 24-48h home delivery"
+                },
+                outside: {
+                    fee: 120,
+                    label: "Outside Dhaka Region",
+                    subtext: "Condition shipping in 3-5 days"
+                }
+            },
+
+            // Product Information
+            product: {
+                name: "Premium Quality Pakistani stretch Fabric Panjabi",
+                category: "Panjabi & Lifestyle",
+                basePrice: 1940, // Price in BDT (৳) before discount
+                sizes: ["M-40", "L-42", "XL-44"],
+
+                // Color swatches (primaryHex changes the color circle preview)
+                colors: [
+                    { id: "merun", name: "merun", primaryHex: "#6E516A" },
+                    // { id: "obsidian", name: "Obsidian Black", primaryHex: "#1A1A1A"},
+                    // { id: "volt", name: "Volt Yellow", primaryHex: "#DDFF00" }
+                ],
+
+                // Image assets mapped directly to color IDs
+                images: {
+                    merun: [
+                        "/stiz-kof-hata.png",
+                        "stetch-kof-hata_1-panjabi.jpg",
+                        "stetch-kof-hata_2-panjabi.jpg",
+                        "stetch-kof-hata_3-panjabi.jpg"
+                    ],
+                  
+                    // obsidian: [
+                    //     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80"
+                    // ],
+                    // volt: [
+                    //     "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1000&q=80",
+                    //     "https://images.unsplash.com/photo-1514989940723-e8e51635b782?auto=format&fit=crop&w=1000&q=80"
+                    // ]
+                },
+
+                // Features listed below description
+                features: [
+                    "Premium Quality Fabric & Tailoring designed for the modern Panjabi lifestyle.",
+                    "Pakistani Stretch Fabric.",
+                    "Modern Design & Aesthetics Look.",
+                    "Committed 100% Satisfaction with every purchase."
+                ],
+
+                // Content of bottom interactive tabs
+                tabs: {
+                    description: {
+                        heading: "Qaulity for Comfortable & Shiney Panjabi Lifestyle",
+                        text1: "পাঞ্জাবি হলো বাঙালি পুরুষদের সবচেয়ে ঐতিহ্যবাহী এবং প্রিয় একটি পোশাক। যেকোনো উৎসব-পার্বণ কিংবা বিশেষ সামাজিক অনুষ্ঠানে বাঙালির আভিজাত্য ও সংস্কৃতির বহিঃপ্রকাশ ঘটে এই পোশাকের মাধ্যমে।.",
+                        text2: "পাঞ্জাবির সাথে ঐতিহ্যগতভাবে সাদা সুতি পাজামা বা ধুতি পরা হয়। তবে বর্তমান সময়ে তরুণ প্রজন্মের মধ্যে পাঞ্জাবির সাথে আলিগড়ি পাজামা, চুড়িদার পাজামা কিংবা ক্যাজুয়াল লুকে ব্লু বা ব্ল্যাক জিন্স পরার দারুণ চল রয়েছে।."
+                    },
+                   
+                    shipping: [
+                        "Dhaka Metropolitan: Delivery processed within 24 to 48 hours (Flat Rate ৳60).",
+                        "Outside Dhaka Region: Courier conditional distribution handled in 3-5 working days (Flat Rate ৳120).",
+                        "Return Policy: যেকোনো problem-এ 3 days-এর মধ্যে return এর সুযোগ রয়েছে। শর্ত: প্রোডাক্টটি খোলার সময় অবশ্যই একটি unboxing video করতে হবে।."
+                    ]
+                }
+            }
+        };
+
+        // =========================================================================
+        // 🧩 MODULAR REUSABLE COMPONENTS
+        // =========================================================================
+
+        // Header Component
+        function Header({ cartCount, onCartOpen }) {
+            return (
+                <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "../index.html"}>
+                            <div className="bg-slate-900 text-white p-2 rounded-full">
+                                <img src="../NovaApparel_Logo.png" alt="Nova Apparel Logo" className="w-7 h-7 " />
+                            </div>
+                            <span className="font-extrabold text-xl tracking-tight text-slate-900" >NOVA APPAREL</span>
+                        </div>
+
+                        <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+                            <a href="../index.html" className="hover:text-slate-900 transition-colors">Home</a>
+                            <a href="#Collection" className="hover:text-slate-900 transition-colors">Collection</a>
+                        </nav>
+
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={onCartOpen}
+                                className="relative p-2.5 bg-slate-100 hover:bg-slate-200 rounded-full transition-all text-slate-800"
+                                aria-label="Open Shopping Cart"
+                            >
+                                <svg className="w-5.5 h-5.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                </svg>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 bg-emerald-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full ring-2 ring-white">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Action Toast Component
+        function Toast({ toast }) {
+            if (!toast) return null;
+            return (
+                <div className="fixed bottom-6 right-6 z-50 max-w-sm transition-all duration-300">
+                    <div className={`p-4 rounded-xl shadow-2xl flex items-center gap-3 border ${toast.type === "error" ? "bg-red-50 border-red-200 text-red-800" :
+                            toast.type === "info" ? "bg-blue-50 border-blue-200 text-blue-800" :
+                                "bg-emerald-50 border-emerald-200 text-emerald-800"
+                        }`}>
+                        <svg className={`w-5 h-5 flex-shrink-0 ${toast.type === "error" ? "text-red-600" : toast.type === "info" ? "text-blue-600" : "text-emerald-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <p className="text-xs font-semibold">{toast.message}</p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Tab Container Component
+        function TabbedDetails({ activeTab, setActiveTab }) {
+            const tabs = STORE_CONFIG.product.tabs;
+            const features = STORE_CONFIG.product.features;
+
+            return (
+                <div id="details" className="mt-16 pt-12 border-t border-slate-200">
+                    <div className="flex border-b border-slate-200 max-w-xl">
+                        {["description", "shipping"].map((tab) => (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tab)}
+                                className={`py-3 px-6 font-extrabold text-sm border-b-2 transition-all capitalize ${activeTab === tab ? "border-slate-950 text-slate-950" : "border-transparent text-slate-400 hover:text-slate-600"
+                                    }`}
+                            >
+                                {tab === "shipping" ? "Shipping & Returns" : "Description"}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="py-6 max-w-4xl text-slate-600 leading-relaxed text-sm">
+                        {activeTab === "description" && (
+                            <div className="space-y-4">
+                                <p className="font-medium text-slate-800 text-base">{tabs.description.heading}</p>
+                                <p>{tabs.description.text1}</p>
+                                <p>{tabs.description.text2}</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                                    {features.map((feature, i) => (
+                                        <div key={i} className="flex gap-2.5 items-start">
+                                            <span className="p-1 rounded-full bg-indigo-50 text-indigo-600 mt-0.5">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </span>
+                                            <span>{feature}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "specs" && (
+                            <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white max-w-2xl">
+                                {tabs.specs.map((spec, index) => (
+                                    <div key={index} className={`grid grid-cols-2 p-4 ${index !== tabs.specs.length - 1 ? "border-b border-slate-100" : ""}`}>
+                                        <span className="font-extrabold text-slate-800">{spec.label}</span>
+                                        <span>{spec.value}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {activeTab === "shipping" && (
+                            <div className="space-y-4">
+                                <p className="font-semibold text-slate-800">Secure Dispatch & Return policy:</p>
+                                <ul className="list-disc pl-5 space-y-2">
+                                    {tabs.shipping.map((policy, i) => <li key={i}>{policy}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+
+        // =========================================================================
+        //  MAIN APPLICATION ROOT
+        // =========================================================================
+        function App() {
+            // Null initialized size & courier to satisfy Requirement 1
+            const [selectedColor, setSelectedColor] = useState(STORE_CONFIG.product.colors[0]);
+            const [selectedSize, setSelectedSize] = useState(null);
+            const [deliveryZone, setDeliveryZone] = useState(null);
+            const [currentImageIndex, setCurrentImageIndex] = useState(0);
+            const [quantity, setQuantity] = useState(1);
+
+            // Active validation error highlights
+            const [sizeError, setSizeError] = useState(false);
+            const [zoneError, setZoneError] = useState(false);
+
+            // Shipping fee resolves to 0 when deliveryZone is not selected yet
+            const courierFee = deliveryZone
+                ? (deliveryZone === "dhaka" ? STORE_CONFIG.shipping.dhaka.fee : STORE_CONFIG.shipping.outside.fee)
+                : 0;
+
+            // Cart Drawer state
+            const [cartCount, setCartCount] = useState(0);
+            const [cartItems, setCartItems] = useState([]);
+            const [isCartOpen, setIsCartOpen] = useState(false);
+
+            // Popups & Modal Checkout Form States
+            const [isPopupOpen, setIsPopupOpen] = useState(false);
+            const [fullName, setFullName] = useState("");
+            const [address, setAddress] = useState("");
+            const [phone, setPhone] = useState("");
+            const [isCartCheckout, setIsCartCheckout] = useState(false); // True if checking out entire cart
+
+            const [activeTab, setActiveTab] = useState("description");
+            const [toast, setToast] = useState(null);
+
+            // Gesture Refs & States
+            const [touchStartX, setTouchStartX] = useState(null);
+            const [touchMoveX, setTouchMoveX] = useState(null);
+            const imageContainerRef = useRef(null);
+
+            // Price formulation calculations
+            const basePrice = STORE_CONFIG.product.basePrice;
+            const discountedUnitPrice = (basePrice * (1 - STORE_CONFIG.discountPercent / 100));
+            const calculatedSavings = (basePrice - discountedUnitPrice);
+
+            const triggerToast = (message, type = "success") => {
+                setToast({ message, type });
+                setTimeout(() => setToast(null), 4000);
+            };
+
+            const handleColorChange = (color) => {
+                setSelectedColor(color);
+                setCurrentImageIndex(0);
+                triggerToast(`Color changed to ${color.name}`);
+            };
+
+            // Mobile Gesture Controls
+            const handleTouchStart = (e) => setTouchStartX(e.touches[0].clientX);
+            const handleTouchMove = (e) => {
+                if (!touchStartX) return;
+                setTouchMoveX(e.touches[0].clientX);
+            };
+            const handleTouchEnd = () => {
+                if (!touchStartX || !touchMoveX) return;
+                const difference = touchStartX - touchMoveX;
+                const threshold = 50;
+
+                if (difference > threshold) {
+                    nextImage();
+                } else if (difference < -threshold) {
+                    prevImage();
+                }
+                setTouchStartX(null);
+                setTouchMoveX(null);
+            };
+
+            const nextImage = () => {
+                const totalImages = STORE_CONFIG.product.images[selectedColor.id].length;
+                setCurrentImageIndex((prev) => (prev + 1) % totalImages);
+            };
+
+            const prevImage = () => {
+                const totalImages = STORE_CONFIG.product.images[selectedColor.id].length;
+                setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+            };
+
+            // Selection Validator check before any actions
+            const validateSelections = () => {
+                let isValid = true;
+                if (!selectedSize) {
+                    setSizeError(true);
+                    triggerToast("Please select a size first!", "error");
+                    isValid = false;
+                } else {
+                    setSizeError(false);
+                }
+
+                if (!deliveryZone) {
+                    setZoneError(true);
+                    triggerToast("Please select a shipping zone first!", "error");
+                    isValid = false;
+                } else {
+                    setZoneError(false);
+                }
+
+                return isValid;
+            };
+
+            // Trigger Direct Purchase Form popup modal
+            const triggerDirectOrderPopup = () => {
+                if (!STORE_CONFIG.isInStock) {
+                    triggerToast("This item is currently out of stock.", "error");
+                    return;
+                }
+                if (validateSelections()) {
+                    setIsCartCheckout(false);
+                    setIsPopupOpen(true);
+                }
+            };
+
+            // Trigger Cart Checkout Form popup modal
+            const triggerCartOrderPopup = () => {
+                if (!deliveryZone) {
+                    setZoneError(true);
+                    triggerToast("Please select a shipping zone first in the main screen!", "error");
+                    setIsCartOpen(false);
+                    return;
+                }
+                setIsCartCheckout(true);
+                setIsCartOpen(false);
+                setIsPopupOpen(true);
+            };
+
+            // Compile order particulars and dispatch directly to WhatsApp link
+            const sendWhatsAppMessage = () => {
+                // Form validation inside checkout popup
+                if (!fullName.trim() || !address.trim() || !phone.trim()) {
+                    triggerToast("Please fill up all the fields first!", "error");
+                    return;
+                }
+
+                let messageBody = "";
+                const zoneText = deliveryZone === "dhaka" ? `${STORE_CONFIG.shipping.dhaka.label} (৳${STORE_CONFIG.shipping.dhaka.fee})` : `${STORE_CONFIG.shipping.outside.label} (৳${STORE_CONFIG.shipping.outside.fee})`;
+
+                if (!isCartCheckout) {
+                    // Direct checkout single order details
+                    const itemTotal = (discountedUnitPrice * quantity);
+                    const orderGrandTotal = itemTotal + courierFee;
+
+                    messageBody = `🛍️ *ORDER FORM*\n\n` +
+                        `👤 *Customer Info:*\n` +
+                        `- Name: ${fullName.trim()}\n` +
+                        `- Address: ${address.trim()}\n` +
+                        `- Phone: ${phone.trim()}\n\n` +
+                        `📦 *Product Details:*\n` +
+                        `- Product: ${STORE_CONFIG.product.name}\n` +
+                        `- Color: ${selectedColor.name}\n` +
+                        `- Size: ${selectedSize}\n` +
+                        `- Quantity: ${quantity}\n` +
+                        `- Unit Price: ৳${discountedUnitPrice.toLocaleString()}\n` +
+                        `- Subtotal: ৳${itemTotal.toLocaleString()}\n\n` +
+                        `🚚 *Shipping:*\n` +
+                        `- Delivery Zone: ${zoneText}\n` +
+                        `- Courier Fee: ৳${courierFee}\n\n` +
+                        `⚡ *GRAND TOTAL:* ৳${orderGrandTotal.toLocaleString()}\n\n` +
+                        `---------------------------------\n` +
+                        `Please process this  order!`;
+                } else {
+                    // Cart drawer multi-item checkout details
+                    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+                    const grandTotal = subtotal + courierFee;
+                    let itemsDetail = "";
+
+                    cartItems.forEach((item, index) => {
+                        itemsDetail += `${index + 1}. *${item.name}*\n` +
+                            `   - Color: ${item.color}\n` +
+                            `   - Size: ${item.size}\n` +
+                            `   - Qty: ${item.quantity}\n` +
+                            `   - Subtotal: ৳${(item.price * item.quantity).toLocaleString()}\n\n`;
+                    });
+
+                    messageBody = `🛍️ *NEW CART ORDER*\n\n` +
+                        `👤 *Customer Info:*\n` +
+                        `- Name: ${fullName.trim()}\n` +
+                        `- Address: ${address.trim()}\n` +
+                        `- Phone: ${phone.trim()}\n\n` +
+                        `📦 *Items List:*\n` +
+                        `---------------------------------\n` +
+                        `${itemsDetail}` +
+                        `---------------------------------\n` +
+                        `🚚 *Summary:*\n` +
+                        `- Total Items: ${cartCount}\n` +
+                        `- Courier Zone: ${zoneText}\n` +
+                        `- Courier Charge: ৳${courierFee}\n\n` +
+                        `⚡ *GRAND TOTAL:* ৳${grandTotal.toLocaleString()}\n\n` +
+                        `Please process this checkout order!`;
+                }
+
+                const cleanNumber = STORE_CONFIG.whatsappNumber.replace(/[^0-9]/g, "");
+                const encodedText = encodeURIComponent(messageBody);
+                const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodedText}`;
+
+                triggerToast("Order Compiled! Opening WhatsApp now...");
+                setTimeout(() => {
+                    window.open(whatsappUrl, '_blank');
+                    setIsPopupOpen(false);
+                    // If checkout succeeds, optionally wipe fields
+                    setFullName("");
+                    setAddress("");
+                    setPhone("");
+                    if (isCartCheckout) {
+                        setCartItems([]);
+                        setCartCount(0);
+                    }
+                }, 800);
+            };
+
+            const handleAddToCart = () => {
+                if (!STORE_CONFIG.isInStock) {
+                    triggerToast("This item is currently out of stock.", "error");
+                    return;
+                }
+                if (!validateSelections()) return;
+
+                const newItem = {
+                    id: `${selectedColor.id}-${selectedSize}-${Date.now()}`,
+                    name: STORE_CONFIG.product.name,
+                    color: selectedColor.name,
+                    size: selectedSize,
+                    price: discountedUnitPrice,
+                    quantity: quantity,
+                    image: STORE_CONFIG.product.images[selectedColor.id][0]
+                };
+
+                setCartItems(prev => [...prev, newItem]);
+                setCartCount(prev => prev + quantity);
+                triggerToast(`Added ${quantity} item(s) to Cart! Click on the cart icon to complete your order.`);
+                setQuantity(1);
+            };
+
+            const handleRemoveCartItem = (itemId, itemQty) => {
+                setCartItems(prev => prev.filter(item => item.id !== itemId));
+                setCartCount(prev => Math.max(0, prev - itemQty));
+                triggerToast("Removed item from cart", "info");
+            };
+
+            return (
+                <div className="relative min-h-screen pb-24">
+
+                    <Header cartCount={cartCount} onCartOpen={() => setIsCartOpen(true)} />
+
+                    <Toast toast={toast} />
+
+                    { }
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+
+                        {/* Breadcrumbs */}
+                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-6">
+                            <a href="/index.html" className="hover:text-slate-800 cursor-pointer">Home</a>
+                            <span>/</span>
+                            <span className="font-semibold text-slate-800 cursor-pointer">{STORE_CONFIG.product.name}</span>
+                        </div>
+
+                        {/* Two Column Layout Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+                            {/* LEFT COLUMN: Gallery & Thumbnails */}
+                            <div className="lg:col-span-7 space-y-4">
+                                <div className="relative bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+
+                                    {/* Action Tags */}
+                                    <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                                        <span className="bg-indigo-600 text-white font-extrabold text-[11px] uppercase tracking-wider px-3 py-1 rounded-full shadow">
+                                            {STORE_CONFIG.discountPercent}% OFF SPECIAL OFFER
+                                        </span>
+                                        {STORE_CONFIG.isInStock ? (
+                                            <span className="bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow w-max">
+                                                In Stock
+                                            </span>
+                                        ) : (
+                                            <span className="bg-rose-600 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow w-max animate-pulse">
+                                                Sold Out
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Slider Viewport with Gestures */}
+                                    <div
+                                        ref={imageContainerRef}
+                                        onTouchStart={handleTouchStart}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
+                                        className="relative aspect-square w-full h-[320px] sm:h-[480px] md:h-[520px] overflow-hidden"
+                                    >
+                                        <div
+                                            className="flex h-full slider-transition"
+                                            style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                                        >
+                                            {STORE_CONFIG.product.images[selectedColor.id].map((imgSrc, idx) => (
+                                                <div key={idx} className="w-full h-full flex-shrink-0 bg-slate-50">
+                                                    <img
+                                                        src={imgSrc}
+                                                        alt={`${STORE_CONFIG.product.name} preview ${idx + 1}`}
+                                                        className="w-full h-full object-cover select-none"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Mobile Dots */}
+                                        <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5 md:hidden">
+                                            {STORE_CONFIG.product.images[selectedColor.id].map((_, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentImageIndex(idx)}
+                                                    className={`h-2 rounded-full transition-all ${currentImageIndex === idx ? "w-6 bg-slate-900" : "w-2 bg-slate-300"
+                                                        }`}
+                                                    aria-label={`Go to slide ${idx + 1}`}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        {/* Desktop Controls */}
+                                        <button
+                                            onClick={prevImage}
+                                            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg hover:scale-105 transition-all"
+                                            aria-label="Previous image"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                                        </button>
+                                        <button
+                                            onClick={nextImage}
+                                            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg hover:scale-105 transition-all"
+                                            aria-label="Next image"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path></svg>
+                                        </button>
+                                    </div>
+
+                                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] bg-slate-900/90 text-white px-3 py-1 rounded-full pointer-events-none md:hidden flex items-center gap-1.5 shadow">
+                                        <svg className="w-3.5 h-3.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                                        </svg>
+                                        Swipe to browse views
+                                    </div>
+                                </div>
+
+                                {/* Desktop Alternate Preview thumbnails */}
+                                <div className="grid grid-cols-4 gap-3">
+                                    {STORE_CONFIG.product.images[selectedColor.id].map((imgSrc, idx) => {
+                                        const isSelected = currentImageIndex === idx;
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setCurrentImageIndex(idx)}
+                                                className={`relative aspect-square rounded-2xl overflow-hidden bg-white border-2 transition-all duration-200 ${isSelected
+                                                        ? "border-slate-900 ring-2 ring-slate-950/15 scale-[0.98]"
+                                                        : "border-slate-200 hover:border-slate-400"
+                                                    }`}
+                                            >
+                                                <img
+                                                    src={imgSrc}
+                                                    alt={`View thumbnail ${idx + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                                <div className={`absolute inset-0 bg-slate-900 transition-opacity ${isSelected ? "bg-opacity-0" : "bg-opacity-5"
+                                                    }`} />
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* RIGHT COLUMN: Configuration Inputs */}
+                            { }
+                            <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+                                <div className="space-y-6">
+
+                                    <div>
+                                        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-1">
+                                            {STORE_CONFIG.product.name}
+                                        </h1>
+                                        <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">{STORE_CONFIG.product.category}</p>
+                                    </div>
+
+                                    {/* Price Card */}
+                                    <div className="p-5 bg-slate-100 rounded-3xl border border-slate-200/50 flex items-center justify-between">
+                                        <div>
+                                            <div className="flex items-baseline gap-2.5">
+                                                <span className="text-3xl font-extrabold text-slate-950 tracking-tight">
+                                                    ৳{discountedUnitPrice.toLocaleString()}
+                                                </span>
+                                                <span className="text-sm text-slate-400 line-through">
+                                                    ৳{basePrice.toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-[11px] font-bold text-emerald-600 mt-1">
+                                                You save ৳{calculatedSavings.toLocaleString()} ({STORE_CONFIG.discountPercent}% discount applied)
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Colors */}
+                                    <div className="space-y-2.5">
+                                        <label className="text-sm font-bold text-slate-800 flex items-center justify-between">
+                                            <span>Available Colors:</span>
+                                            <span className="text-xs font-semibold text-slate-500 bg-slate-200 px-2.5 py-0.5 rounded-full">{selectedColor.name}</span>
+                                        </label>
+                                        <div className="flex gap-3">
+                                            {STORE_CONFIG.product.colors.map((color) => {
+                                                const isSelected = selectedColor.id === color.id;
+                                                return (
+                                                    <button
+                                                        key={color.id}
+                                                        onClick={() => handleColorChange(color)}
+                                                        className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${isSelected
+                                                                ? "border-slate-900 scale-110 shadow-md"
+                                                                : "border-transparent hover:scale-105"
+                                                            }`}
+                                                        style={{ backgroundColor: color.primaryHex }}
+                                                        title={color.name}
+                                                    >
+                                                        {isSelected && (
+                                                            <svg className="w-5 h-5 text-white drop-shadow" fill="none" stroke="currentColor" strokeWidth="3.5" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Sizes with Requirement 1 highlight error */}
+                                    <div className={`space-y-2.5 p-1 rounded-2xl transition-all duration-300 ${sizeError ? "bg-red-50 ring-2 ring-red-400 p-3" : ""}`}>
+                                        <label className="text-sm font-bold text-slate-800 flex items-center justify-between">
+                                            <span>Select Sizes:</span>
+                                            <span className={`text-xs font-semibold ${selectedSize ? "text-indigo-600" : "text-amber-600 font-extrabold"}`}>
+                                                {selectedSize ? selectedSize : "None Selected *"}
+                                            </span>
+                                        </label>
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {STORE_CONFIG.product.sizes.map((size) => {
+                                                const isSelected = selectedSize === size;
+                                                return (
+                                                    <button
+                                                        key={size}
+                                                        onClick={() => { setSelectedSize(size); setSizeError(false); }}
+                                                        className={`py-2 text-xs font-bold rounded-xl border transition-all ${isSelected
+                                                                ? "bg-slate-900 text-white border-slate-900 shadow-md"
+                                                                : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-400"
+                                                            }`}
+                                                    >
+                                                        {size}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        {sizeError && (
+                                            <p className="text-[10px] text-red-600 font-bold mt-1 animate-pulse">* Size is required before completing checkout.</p>
+                                        )}
+                                    </div>
+
+                                    {/* Shipping Zone Selector with Requirement 1 highlight error */}
+                                    <div id="shipping-spec" className={`p-4 rounded-2xl border transition-all duration-300 ${zoneError ? "bg-red-50 ring-2 ring-red-400 border-red-300" : "bg-white border-slate-200"} space-y-3`}>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block">Select Shipping Zone</span>
+                                            {!deliveryZone && (
+                                                <span className="text-[10px] text-amber-600 font-extrabold uppercase animate-pulse">Required *</span>
+                                            )}
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {/* Inside Dhaka */}
+                                            <button
+                                                onClick={() => { setDeliveryZone("dhaka"); setZoneError(false); triggerToast("Shipping updated: Inside Dhaka"); }}
+                                                className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all ${deliveryZone === "dhaka"
+                                                        ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-sm"
+                                                        : "border-slate-200 hover:border-slate-300 bg-white"
+                                                    }`}
+                                            >
+                                                <div>
+                                                    <p className="text-xs font-bold text-slate-900">Inside Dhaka</p>
+                                                    <p className="text-[10px] text-slate-500">{STORE_CONFIG.shipping.dhaka.subtext}</p>
+                                                </div>
+                                                <span className="text-xs font-extrabold text-slate-900">৳{STORE_CONFIG.shipping.dhaka.fee}</span>
+                                            </button>
+
+                                            {/* Outside Dhaka */}
+                                            <button
+                                                onClick={() => { setDeliveryZone("outside"); setZoneError(false); triggerToast("Shipping updated: Outside Dhaka"); }}
+                                                className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all ${deliveryZone === "outside"
+                                                        ? "border-slate-900 bg-slate-50 ring-1 ring-slate-900 shadow-sm"
+                                                        : "border-slate-200 hover:border-slate-300 bg-white"
+                                                    }`}
+                                            >
+                                                <div>
+                                                    <p className="text-xs font-bold text-slate-900">Outside Dhaka</p>
+                                                    <p className="text-[10px] text-slate-500">{STORE_CONFIG.shipping.outside.subtext}</p>
+                                                </div>
+                                                <span className="text-xs font-extrabold text-slate-900">৳{STORE_CONFIG.shipping.outside.fee}</span>
+                                            </button>
+                                        </div>
+                                        {zoneError && (
+                                            <p className="text-[10px] text-red-600 font-bold animate-pulse">* Shipping region is required before checkout.</p>
+                                        )}
+                                    </div>
+
+                                    {/* Order Quantity Counter */}
+                                    <div className="flex items-center justify-between py-2">
+                                        <span className="text-sm font-bold text-slate-800">Order Quantity:</span>
+                                        <div className="flex items-center border border-slate-300 rounded-xl overflow-hidden bg-white">
+                                            <button
+                                                onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                                                className="px-3.5 py-2 hover:bg-slate-50 text-slate-700 transition-colors"
+                                                aria-label="Decrease quantity"
+                                            >
+                                                <span className="font-bold text-sm">-</span>
+                                            </button>
+                                            <span className="px-5 font-bold text-sm text-slate-900">{quantity}</span>
+                                            <button
+                                                onClick={() => setQuantity(prev => prev + 1)}
+                                                className="px-3.5 py-2 hover:bg-slate-50 text-slate-700 transition-colors"
+                                                aria-label="Increase quantity"
+                                            >
+                                                <span className="font-bold text-sm">+</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Action CTA Buttons Row modified for Requirements 2 and 3 */}
+                                    <div className="space-y-3 pt-2">
+                                        {/* Replaced WhatsApp direct button with primary Order Now triggers Form Popup */}
+                                        <button
+                                            onClick={triggerDirectOrderPopup}
+                                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/15 active:scale-[0.99] transition-all"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                            </svg>
+                                            Order Now
+                                        </button>
+
+                                        {/* Modified dual 50/50 row: Half Add To Cart, Half Order on Facebook */}
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={handleAddToCart}
+                                                className="w-1/2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm py-4 px-4 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.99] transition-all"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                <span className="truncate">Add to Cart</span>
+                                            </button>
+
+                                            <a
+                                                href={STORE_CONFIG.facebookPageUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-1/2 bg-[#1877F2] hover:bg-[#166FE5] text-white font-extrabold text-sm py-4 px-4 rounded-2xl flex items-center justify-center gap-1.5 active:scale-[0.99] transition-all text-center"
+                                            >
+                                                <svg className="w-4 h-4 fill-current flex-shrink-0" viewBox="0 0 24 24">
+                                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                                </svg>
+                                                <span className="truncate">Order on Facebook</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {/* Interactive Tabbed Detail Sections */}
+                        <TabbedDetails activeTab={activeTab} setActiveTab={setActiveTab} />
+
+                    </main>
+
+                    {/* CART DRAWER SLIDE-OVER PANEL */}
+                    {isCartOpen && (
+                        <div className="fixed inset-0 z-50 overflow-hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+                            <div className="absolute inset-0 overflow-hidden">
+
+                                {/* Backdrop */}
+                                <div
+                                    onClick={() => setIsCartOpen(false)}
+                                    className="absolute inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
+                                />
+
+                                <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                                    <div className="pointer-events-auto w-screen max-w-md">
+                                        <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-2xl">
+
+                                            {/* Header */}
+                                            <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200">
+                                                <h2 className="text-lg font-extrabold text-slate-900" id="slide-over-title">Shopping Cart</h2>
+                                                <button
+                                                    onClick={() => setIsCartOpen(false)}
+                                                    className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-700 rounded-full transition-all"
+                                                >
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            {/* Cart Items list */}
+                                            <div className="flex-1 overflow-y-auto py-6 px-6 space-y-6">
+                                                {cartItems.length === 0 ? (
+                                                    <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                                                        <div className="p-4 bg-slate-100 rounded-full text-slate-400">
+                                                            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-extrabold text-slate-800">Your cart is empty</p>
+                                                            <p className="text-xs text-slate-500 mt-1">Add items to proceed with order dispatch.</p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-4">
+                                                        {cartItems.map((item) => (
+                                                            <div key={item.id} className="flex gap-4 p-4 border border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100/50 transition-colors">
+                                                                <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl border" />
+                                                                <div className="flex-1 flex flex-col justify-between">
+                                                                    <div>
+                                                                        <h4 className="text-xs font-extrabold text-slate-900">{item.name}</h4>
+                                                                        <p className="text-[10px] text-slate-500 mt-0.5">Color: {item.color} | Size: {item.size}</p>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between">
+                                                                        <span className="text-[10px] font-bold text-slate-400">Qty: {item.quantity}</span>
+                                                                        <span className="text-xs font-extrabold text-slate-900">৳{(item.price * item.quantity).toLocaleString()}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                    onClick={() => handleRemoveCartItem(item.id, item.quantity)}
+                                                                    className="text-slate-400 hover:text-red-500 self-start p-1 transition-colors"
+                                                                    title="Remove product"
+                                                                >
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Drawer Footer Summary */}
+                                            {cartItems.length > 0 && (
+                                                <div className="border-t border-slate-200 px-6 py-6 bg-slate-50 space-y-4">
+
+                                                    <div className="flex justify-between text-xs text-slate-600">
+                                                        <span>Shipping Zone ({deliveryZone === "dhaka" ? STORE_CONFIG.shipping.dhaka.label : STORE_CONFIG.shipping.outside.label})</span>
+                                                        <span className="font-semibold">৳{courierFee}</span>
+                                                    </div>
+
+                                                    <div className="flex items-baseline justify-between pt-1">
+                                                        <span className="text-sm font-extrabold text-slate-900">Estimated Total:</span>
+                                                        <span className="text-xl font-extrabold text-slate-950">
+                                                            ৳{(cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0) + courierFee).toLocaleString()}
+                                                        </span>
+                                                    </div>
+
+                                                    {/* Clicking Cart checkout triggers identical fast form popup */}
+                                                    <button
+                                                        onClick={triggerCartOrderPopup}
+                                                        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10 transition-all"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                                        </svg>
+                                                        Proceed Checkout Order
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
+
+                    { }
+                    {/* ORDER NOW MODAL POPUP FORM (Requirement 2) */}
+                    {isPopupOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            {/* Dark Blurred Backdrop */}
+                            <div
+                                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                                onClick={() => setIsPopupOpen(false)}
+                            />
+
+                            {/* Form Panel Container */}
+                            <div className="bg-white w-full max-w-md rounded-3xl p-6 relative z-10 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+
+                                {/* Header */}
+                                <div className="flex justify-between items-center mb-5 border-b border-slate-100 pb-3">
+                                    <div>
+                                        <h3 className="text-lg font-extrabold text-slate-900">Complete Delivery Form</h3>
+                                        <p className="text-[11px] text-slate-500 mt-0.5">Please provide shipping address details.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsPopupOpen(false)}
+                                        className="text-slate-400 hover:text-slate-600 p-1.5 hover:bg-slate-100 rounded-full transition-colors"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {/* Selection Summary Preview */}
+                                <div className="mb-5 p-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-xs space-y-1.5">
+                                    <div className="flex justify-between font-bold text-slate-800">
+                                        <span>Product:</span>
+                                        <span className="text-indigo-600 font-extrabold">{STORE_CONFIG.product.name}</span>
+                                    </div>
+                                    {!isCartCheckout ? (
+                                        <React.Fragment>
+                                            <div className="flex justify-between text-slate-500">
+                                                <span>Color & Size:</span>
+                                                <span className="font-semibold text-slate-700">{selectedColor.name} | {selectedSize}</span>
+                                            </div>
+                                            <div className="flex justify-between text-slate-500">
+                                                <span>Qty & Unit Price:</span>
+                                                <span className="font-semibold text-slate-700">{quantity}x ৳{discountedUnitPrice.toLocaleString()}</span>
+                                            </div>
+                                        </React.Fragment>
+                                    ) : (
+                                        <div className="flex justify-between text-slate-500">
+                                            <span>Cart Items count:</span>
+                                            <span className="font-semibold text-slate-700">{cartCount} items</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-slate-500">
+                                        <span>Shipping ({deliveryZone === "dhaka" ? "Inside Dhaka" : "Outside Dhaka"}):</span>
+                                        <span className="font-semibold text-slate-700">৳{courierFee}</span>
+                                    </div>
+                                    <div className="flex justify-between text-slate-800 font-extrabold pt-1.5 border-t border-slate-200">
+                                        <span>Estimated Grand Total:</span>
+                                        <span className="text-emerald-600">
+                                            ৳{!isCartCheckout
+                                                ? ((discountedUnitPrice * quantity) + courierFee).toLocaleString()
+                                                : (cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0) + courierFee).toLocaleString()
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Form Inputs */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">1. Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={fullName}
+                                            onChange={(e) => setFullName(e.target.value)}
+                                            placeholder="Your Name"
+                                            className="w-full text-sm font-semibold px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all placeholder-slate-400"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">2. Complete Address</label>
+                                        <textarea
+                                            value={address}
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            placeholder="Your Delivery Address "
+                                            rows="2"
+                                            className="w-full text-sm font-semibold px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all placeholder-slate-400 resize-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1">3. Mobile Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            placeholder="017XXXXXXXX"
+                                            className="w-full text-sm font-semibold px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/25 focus:border-emerald-500 transition-all placeholder-slate-400"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Submit Checkout Action to WhatsApp */}
+                                <div className="mt-6 pt-4 border-t border-slate-100">
+                                    <button
+                                        onClick={sendWhatsAppMessage}
+                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-4 px-6 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-[0.99] transition-all"
+                                    >
+                                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M17.472 14.382c-.022-.014-.507-.252-.587-.285-.08-.03-.137-.045-.195.041-.058.087-.227.285-.278.346-.051.061-.102.069-.195.022-.211-.104-.766-.282-1.46-1.4-.54-.48-.904-1.074-.986-1.2-.086-.127-.01-.194.053-.257.057-.056.126-.147.19-.22.064-.074.086-.124.129-.207.043-.083.022-.156-.011-.22-.032-.064-.195-.47-.268-.646-.07-.168-.142-.144-.195-.147-.05-.002-.108-.002-.167-.002-.058 0-.154.022-.234.11-.08.088-.308.302-.308.736 0 .434.316.852.36 0 .913.044.059 1.402 1.058 2.028 1.54 1.2 1.343 1.956 1.343 1.956.402 0 .782-.12 1.075-.333.292-.214.482-.336.56-.336.08 0 .16.03.226.064.066.033.483.238.583.287.1.049.167.074.19.113.024.038.024.218-.056.452-.082.234-.482.457-.665.48-.182.022-.364.045-1.077-.234z" />
+                                            <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 2.012.597 3.882 1.624 5.447L2.046 22l4.73-1.513C8.243 21.436 10.05 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zM3.5 12c0-4.687 3.813-8.5 8.5-8.5s8.5 3.813 8.5 8.5-3.813 8.5-8.5 8.5c-1.85 0-3.565-.592-4.966-1.597l-.356-.255-2.934.938.956-2.812-.278-.43A8.455 8.455 0 013.5 12z" />
+                                        </svg>
+                                        Send to WhatsApp
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            );
+        }
+
+        // Render the fully configured React Component
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
+        
+    </script>
+    
+</body>
+
+</html>
