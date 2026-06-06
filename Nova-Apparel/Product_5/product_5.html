@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova Apparel</title>
-    <link rel="icon" type="image/png" href="../NovaApparel_Logo.png">
+    <link rel="icon" type="image/png" href="../nova-apparel-Logo.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter) -->
@@ -86,7 +86,7 @@
             product: {
                 name: "Premium Quality Fabric Panjabi",
                 category: "Panjabi & Lifestyle",
-                basePrice: 1765, // Price in BDT (৳) before discount
+                basePrice: 1800, // Price in BDT (৳) before discount
                 sizes: ["M-40", "L-42", "XL-44"],
 
                 // Color swatches (primaryHex changes the color circle preview)
@@ -100,9 +100,9 @@
                 images: {
                     maroon: [
                         "/stretch-maroon-panjabi.png",
-                        "stetch_1-panjabi.jpg",
-                        "stetch_2panjabi.jpg",
-                        "stetch_3-panjabi.jpg"
+                        "stretch-maroon_1-panjabi.png",
+                        "stretch-maroon_2-panjabi.png",
+                        "stretch-maroon_3-panjabi.png"
                     ],
                   
                     // obsidian: [
@@ -155,15 +155,15 @@
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                         <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.location.href = "../index.html"}>
                             <div className="bg-slate-900 text-white p-2 rounded-full">
-                                <img src="../NovaApparel_Logo.png" alt="Nova Apparel Logo" className="w-7 h-7 " />
+                                <img src="../nova-apparel-Logo.png" alt="Nova Apparel Logo" className="w-7 h-7 " />
                             </div>
 
-                            <span className="font-extrabold text-xl tracking-tight text-slate-900">
+                            <span className="hidden sm:block font-extrabold text-xl tracking-tight text-slate-900">
                                 NOVA APPAREL
                             </span>
                         </div>
 
-                        <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+                        <nav className="flex gap-7 md:gap-9 text-sm font-medium text-slate-600">
                             <a href="../index.html" className="hover:text-slate-900 transition-colors">Home</a>
                             <a href="#Collection" className="hover:text-slate-900 transition-colors">Collection</a>
                         </nav>
@@ -248,16 +248,6 @@
                             </div>
                         )}
 
-                        {activeTab === "specs" && (
-                            <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white max-w-2xl">
-                                {tabs.specs.map((spec, index) => (
-                                    <div key={index} className={`grid grid-cols-2 p-4 ${index !== tabs.specs.length - 1 ? "border-b border-slate-100" : ""}`}>
-                                        <span className="font-extrabold text-slate-800">{spec.label}</span>
-                                        <span>{spec.value}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
 
                         {activeTab === "shipping" && (
                             <div className="space-y-4">
@@ -541,12 +531,12 @@
 
                             {/* LEFT COLUMN: Gallery & Thumbnails */}
                             <div className="lg:col-span-7 space-y-4">
-                                <div className="relative bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+                                <div className="relative bg-white border border-slate-200 rounded-1xl overflow-hidden shadow-sm">
 
                                     {/* Action Tags */}
                                     <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                                        <span className="bg-indigo-600 text-white font-extrabold text-[11px] uppercase tracking-wider px-3 py-1 rounded-full shadow">
-                                            {STORE_CONFIG.discountPercent}% OFF SPECIAL OFFER
+                                        <span className="bg-red-500 text-white font-extrabold text-[11px] uppercase tracking-wider px-3 py-1 rounded-full shadow">
+                                            {STORE_CONFIG.discountPercent}% OFF
                                         </span>
                                         {STORE_CONFIG.isInStock ? (
                                             <span className="bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow w-max">
@@ -565,7 +555,7 @@
                                         onTouchStart={handleTouchStart}
                                         onTouchMove={handleTouchMove}
                                         onTouchEnd={handleTouchEnd}
-                                        className="relative aspect-square w-full h-[320px] sm:h-[480px] md:h-[520px] overflow-hidden"
+                                        className="relative aspect-square w-full h-[360px] sm:h-[480px] md:h-[590px] overflow-hidden transition-transform duration-500 ease-in-out transform hover:scale-110"
                                     >
                                         <div
                                             className="flex h-full slider-transition"
@@ -652,17 +642,17 @@
                                 <div className="space-y-6">
 
                                     <div>
-                                        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-1">
+                                        <h1 className="text-xs sm:text-3xl font-extrabold tracking-tight text-slate-900 mb-1">
                                             {STORE_CONFIG.product.name}
                                         </h1>
-                                        <p className="text-xs font-bold uppercase tracking-wider text-indigo-600">{STORE_CONFIG.product.category}</p>
+                                        <p className="text-[10px] md:text-xs uppercase tracking-wider text-indigo-600">{STORE_CONFIG.product.category}</p>
                                     </div>
 
                                     {/* Price Card */}
                                     <div className="p-5 bg-slate-100 rounded-3xl border border-slate-200/50 flex items-center justify-between">
                                         <div>
                                             <div className="flex items-baseline gap-2.5">
-                                                <span className="text-3xl font-extrabold text-slate-950 tracking-tight">
+                                                <span className="text-2xl md:text-3x1 font-extrabold text-indigo-700 tracking-tight">
                                                     ৳{discountedUnitPrice.toLocaleString()}
                                                 </span>
                                                 <span className="text-sm text-slate-400 line-through">
